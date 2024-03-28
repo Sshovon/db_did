@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "target": "es6",
+    "outDir": "dist",
+    "rootDir": "src",
+    "allowSyntheticDefaultImports": true
+  }
+}
