@@ -33,7 +33,7 @@ export class DbAnonCredsRegistry implements AnonCredsRegistry {
       registrationMetadata: {},
       schemaMetadata: {},
     }
-  }u
+  }
   getCredentialDefinition(agentContext: AgentContext, credentialDefinitionId: string): Promise<GetCredentialDefinitionReturn> {
     throw new Error('Method not implemented.')
   }

@@ -1,14 +1,15 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "target": "es6",
+    "target": "esnext",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
     "outDir": "build",
     "rootDir": "src",
-    "allowSyntheticDefaultImports": true,
-    "skipLibCheck": true
+    "experimentalDecorators": true,
   },
+  "include": ["src/**/*"],
   "exclude": ["node_modules"]
 }
