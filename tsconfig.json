@@ -5,8 +5,10 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "target": "es6",
-    "outDir": "dist",
+    "outDir": "build",
     "rootDir": "src",
-    "allowSyntheticDefaultImports": true
-  }
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
+  },
+  "exclude": ["node_modules"]
 }

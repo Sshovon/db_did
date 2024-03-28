@@ -7,10 +7,11 @@
   "author": "",
   "license": "ISC",
   "scripts": {
-    "build": "yarn run clean && yarn run compile",
     "clean": "rimraf ./build",
     "compile": "tsc -p tsconfig.json",
-    "prepublishOnly": "yarn run build"
+    "prepublishOnly": "yarn clean & yarn run build",
+    "build": "npm run build:tsc",
+    "build:tsc": "tsc"
   },
   "dependencies": {
     "@aries-framework/anoncreds": "0.4.2",
