@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.verifyResourceId = exports.calculateResourceId = void 0;
+exports.parseDidDb = exports.getDidDbSchemaId = exports.verifyResourceId = exports.calculateResourceId = void 0;
 const core_1 = require("@aries-framework/core");
 const canonicalize_1 = __importDefault(require("canonicalize"));
 function calculateResourceId(resourceObjectValue) {
@@ -18,3 +18,12 @@ function verifyResourceId(resourceObjectValue, resourceId) {
     return calculateResourceId(resourceObjectValue) === resourceId;
 }
 exports.verifyResourceId = verifyResourceId;
+function getDidDbSchemaId(unqualifiedDid, name, version) {
+    return `did:db:${unqualifiedDid}/anoncreds/v0/SCHEMA/${name}/${version}`;
+}
+exports.getDidDbSchemaId = getDidDbSchemaId;
+function parseDidDb(did) {
+    const [didPrefix, didMethod, namespaceIdentifier] = did.split(':');
+    return { namespaceIdentifier, didMethod };
+}
+exports.parseDidDb = parseDidDb;

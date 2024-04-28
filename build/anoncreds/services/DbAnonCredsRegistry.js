@@ -1,20 +1,56 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DbAnonCredsRegistry = void 0;
-const utils_1 = require("../utils/utils");
+const core_1 = require("@aries-framework/core");
 class DbAnonCredsRegistry {
     getSchema(agentContext, schemaId) {
         throw new Error('Method not implemented.');
     }
     async registerSchema(agentContext, options) {
-        // Nothing to actually do other than generating a schema id
-        const resourceId = (0, utils_1.calculateResourceId)(options.schema);
-        const schemaId = `${options.schema.issuerId}?service=anoncreds&relativeRef=/schema/${resourceId}`;
-        return {
-            schemaState: { state: 'finished', schema: options.schema, schemaId },
-            registrationMetadata: {},
-            schemaMetadata: {},
-        };
+        try {
+            const schema = options.schema;
+            const schemaResource = {
+                id: core_1.utils.uuid(),
+                name: `${schema.name}-Schema`,
+                resourceType: 'anonCredsSchema',
+                data: {
+                    name: schema.name,
+                    version: schema.version,
+                    attrNames: schema.attrNames,
+                },
+                version: schema.version,
+            };
+            // const response = await cheqdDidRegistrar.createResource(agentContext, schema.issuerId, schemaResource)
+            // todo create and store
+            // if (response.resourceState.state !== 'finished') {
+            //   throw new Error(response.resourceState.reason)
+            // }
+            return {
+                schemaState: {
+                    state: 'finished',
+                    schema,
+                    schemaId: `${schema.issuerId}/resources/${schemaResource.id}`,
+                },
+                registrationMetadata: {},
+                schemaMetadata: {},
+            };
+        }
+        catch (error) {
+            agentContext.config.logger.debug(`Error registering schema for did '${options.schema.issuerId}'`, {
+                error,
+                did: options.schema.issuerId,
+                schema: options,
+            });
+            return {
+                schemaMetadata: {},
+                registrationMetadata: {},
+                schemaState: {
+                    state: 'failed',
+                    schema: options.schema,
+                    reason: `unknownError: ${error.message}`,
+                },
+            };
+        }
     }
     getCredentialDefinition(agentContext, credentialDefinitionId) {
         throw new Error('Method not implemented.');

@@ -14,3 +14,14 @@ export function calculateResourceId(resourceObjectValue: unknown) {
 export function verifyResourceId(resourceObjectValue: unknown, resourceId: string) {
   return calculateResourceId(resourceObjectValue) === resourceId
 }
+
+export function getDidDbSchemaId(unqualifiedDid: string, name: string, version: string) {
+  return `did:db:${unqualifiedDid}/anoncreds/v0/SCHEMA/${name}/${version}`
+}
+
+export function parseDidDb(did: string) {
+  const [didPrefix, didMethod, namespaceIdentifier] = did.split(':')
+ 
+  return {  namespaceIdentifier, didMethod }
+
+}

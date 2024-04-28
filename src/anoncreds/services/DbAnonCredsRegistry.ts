@@ -24,14 +24,52 @@ export class DbAnonCredsRegistry implements AnonCredsRegistry {
     agentContext: AgentContext,
     options: RegisterSchemaOptions
   ): Promise<RegisterSchemaReturn> {
-    // Nothing to actually do other than generating a schema id
-    const resourceId = calculateResourceId(options.schema)
+    try {
 
-    const schemaId = `${options.schema.issuerId}?service=anoncreds&relativeRef=/schema/${resourceId}`
-    return {
-      schemaState: { state: 'finished', schema: options.schema, schemaId },
-      registrationMetadata: {},
-      schemaMetadata: {},
+      const schema = options.schema
+      const schemaResource = {
+        id: utils.uuid(),
+        name: `${schema.name}-Schema`,
+        resourceType: 'anonCredsSchema',
+        data: {
+          name: schema.name,
+          version: schema.version,
+          attrNames: schema.attrNames,
+        },
+        version: schema.version,
+      }
+
+      // const response = await cheqdDidRegistrar.createResource(agentContext, schema.issuerId, schemaResource)
+      // todo create and store
+      // if (response.resourceState.state !== 'finished') {
+      //   throw new Error(response.resourceState.reason)
+      // }
+
+      return {
+        schemaState: {
+          state: 'finished',
+          schema,
+          schemaId: `${schema.issuerId}/resources/${schemaResource.id}`,
+        },
+        registrationMetadata: {},
+        schemaMetadata: {},
+      }
+    } catch (error) {
+      agentContext.config.logger.debug(`Error registering schema for did '${options.schema.issuerId}'`, {
+        error,
+        did: options.schema.issuerId,
+        schema: options,
+      })
+
+      return {
+        schemaMetadata: {},
+        registrationMetadata: {},
+        schemaState: {
+          state: 'failed',
+          schema: options.schema,
+          reason: `unknownError: ${(error as Error).message}`,
+        },
+      }
     }
   }
   getCredentialDefinition(agentContext: AgentContext, credentialDefinitionId: string): Promise<GetCredentialDefinitionReturn> {
@@ -50,5 +88,5 @@ export class DbAnonCredsRegistry implements AnonCredsRegistry {
 
   public readonly supportedIdentifier = /^did:db:[_a-z0-9.%A-]*/
 
-  
+
 }

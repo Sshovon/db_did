@@ -58,12 +58,10 @@ export class DbDidRegistrar implements DidRegistrar {
                 did: didKey.did,
                 role: DidDocumentRole.Created,
             })
-            // todo 
-            // agentContext.dependencyManager.registerInstance<AgentConfig>("AgentConfig", agentContext.config)
-    
+            
             const didRepository = agentContext.dependencyManager.resolve(DidRepository)
             await didRepository.save(agentContext, didRecord)
-
+            // todo store db
             return {
                 didDocumentMetadata: {},
                 didRegistrationMetadata: {},

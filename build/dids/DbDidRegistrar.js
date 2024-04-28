@@ -31,10 +31,9 @@ class DbDidRegistrar {
                 did: didKey.did,
                 role: core_1.DidDocumentRole.Created,
             });
-            // todo 
-            // agentContext.dependencyManager.registerInstance<AgentConfig>("AgentConfig", agentContext.config)
             const didRepository = agentContext.dependencyManager.resolve(core_1.DidRepository);
             await didRepository.save(agentContext, didRecord);
+            // todo store db
             return {
                 didDocumentMetadata: {},
                 didRegistrationMetadata: {},
