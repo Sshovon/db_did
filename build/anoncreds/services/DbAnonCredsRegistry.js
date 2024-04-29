@@ -20,11 +20,7 @@ class DbAnonCredsRegistry {
                 },
                 version: schema.version,
             };
-            // const response = await cheqdDidRegistrar.createResource(agentContext, schema.issuerId, schemaResource)
             // todo create and store
-            // if (response.resourceState.state !== 'finished') {
-            //   throw new Error(response.resourceState.reason)
-            // }
             return {
                 schemaState: {
                     state: 'finished',
@@ -55,8 +51,32 @@ class DbAnonCredsRegistry {
     getCredentialDefinition(agentContext, credentialDefinitionId) {
         throw new Error('Method not implemented.');
     }
-    registerCredentialDefinition(agentContext, options) {
-        throw new Error('Method not implemented.');
+    async registerCredentialDefinition(agentContext, options) {
+        try {
+            // throw new Error('Method not implemented.')
+            console.log(options);
+            console.log(options.credentialDefinition.value);
+            return {
+                credentialDefinitionMetadata: {},
+                registrationMetadata: {},
+                credentialDefinitionState: {
+                    credentialDefinition: options.credentialDefinition,
+                    state: 'failed',
+                    reason: `unknownError`,
+                },
+            };
+        }
+        catch (e) {
+            return {
+                credentialDefinitionMetadata: {},
+                registrationMetadata: {},
+                credentialDefinitionState: {
+                    credentialDefinition: options.credentialDefinition,
+                    state: 'failed',
+                    reason: `unknownError`,
+                },
+            };
+        }
     }
     getRevocationRegistryDefinition(agentContext, revocationRegistryDefinitionId) {
         throw new Error('Method not implemented.');
