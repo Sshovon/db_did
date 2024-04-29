@@ -1,31 +1,43 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DbAnonCredsRegistry = void 0;
-const core_1 = require("@aries-framework/core");
+const schema_1 = require("../../ledger/controller/schema");
+const credentialDefintion_1 = require("../../ledger/controller/credentialDefintion");
 class DbAnonCredsRegistry {
-    getSchema(agentContext, schemaId) {
-        throw new Error('Method not implemented.');
-    }
-    async registerSchema(agentContext, options) {
+    async getSchema(agentContext, schemaId) {
         try {
-            const schema = options.schema;
-            const schemaResource = {
-                id: core_1.utils.uuid(),
-                name: `${schema.name}-Schema`,
-                resourceType: 'anonCredsSchema',
-                data: {
+            const schema = await (0, schema_1.retrieveSchema)({ schemaId });
+            return {
+                schema: {
+                    issuerId: schema.issuerId,
                     name: schema.name,
                     version: schema.version,
                     attrNames: schema.attrNames,
                 },
-                version: schema.version,
+                schemaMetadata: {},
+                schemaId: schema.schemaId,
+                resolutionMetadata: {},
             };
-            // todo create and store
+        }
+        catch (e) {
+            return {
+                schemaId,
+                resolutionMetadata: {
+                    error: e.message || 'notFound',
+                },
+                schemaMetadata: {},
+            };
+        }
+    }
+    async registerSchema(agentContext, options) {
+        try {
+            const schema = options.schema;
+            const result = await (0, schema_1.storeSchema)({ schema });
             return {
                 schemaState: {
                     state: 'finished',
                     schema,
-                    schemaId: `${schema.issuerId}/resources/${schemaResource.id}`,
+                    schemaId: result.schemaId,
                 },
                 registrationMetadata: {},
                 schemaMetadata: {},
@@ -48,21 +60,43 @@ class DbAnonCredsRegistry {
             };
         }
     }
-    getCredentialDefinition(agentContext, credentialDefinitionId) {
-        throw new Error('Method not implemented.');
+    async getCredentialDefinition(agentContext, credentialDefinitionId) {
+        try {
+            const credentialDefinition = await (0, credentialDefintion_1.retrieveCredentialDefinition)({ credentialDefinitionId });
+            return {
+                credentialDefinitionId: credentialDefinition.credentialDefinitionId,
+                credentialDefinition: {
+                    issuerId: credentialDefinition.issuerId,
+                    schemaId: credentialDefinition.schemaId,
+                    tag: credentialDefinition.tag,
+                    value: credentialDefinition.value,
+                    type: 'CL'
+                },
+                credentialDefinitionMetadata: {},
+                resolutionMetadata: {},
+            };
+        }
+        catch (e) {
+            return {
+                credentialDefinitionId,
+                credentialDefinitionMetadata: {},
+                resolutionMetadata: {
+                    error: e.message || 'notFound',
+                    message: `unable to resolve credential definition: ${e.message}`,
+                },
+            };
+        }
     }
     async registerCredentialDefinition(agentContext, options) {
         try {
-            // throw new Error('Method not implemented.')
-            console.log(options);
-            console.log(options.credentialDefinition.value);
+            const result = await (0, credentialDefintion_1.storeCredentialDefinition)({ credDef: options.credentialDefinition });
             return {
                 credentialDefinitionMetadata: {},
                 registrationMetadata: {},
                 credentialDefinitionState: {
                     credentialDefinition: options.credentialDefinition,
-                    state: 'failed',
-                    reason: `unknownError`,
+                    credentialDefinitionId: result.credentialDefinitionId,
+                    state: 'finished',
                 },
             };
         }

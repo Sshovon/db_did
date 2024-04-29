@@ -15,37 +15,48 @@ import { AriesFrameworkError, Buffer, Hasher, JsonTransformer, TypedArrayEncoder
 
 import { DbDidRegistrar, DbDidResolver } from '../../dids/index'
 import { calculateResourceId } from '../utils/utils'
+import { retrieveSchema, storeSchema } from '../../ledger/controller/schema'
+import { retrieveCredentialDefinition, storeCredentialDefinition } from '../../ledger/controller/credentialDefintion'
 
 export class DbAnonCredsRegistry implements AnonCredsRegistry {
-  getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn> {
-    throw new Error('Method not implemented.')
+  public async getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn> {
+    try {
+      const schema = await retrieveSchema({ schemaId })
+      return {
+        schema: {
+          issuerId: schema.issuerId,
+          name: schema.name,
+          version: schema.version,
+          attrNames: schema.attrNames,
+        },
+        schemaMetadata: {},
+        schemaId: schema.schemaId,
+        resolutionMetadata: {},
+      }
+
+    } catch (e) {
+      return {
+        schemaId,
+        resolutionMetadata: {
+          error: (e as Error).message || 'notFound',
+        },
+        schemaMetadata: {},
+      };
+    }
   }
+
   public async registerSchema(
     agentContext: AgentContext,
     options: RegisterSchemaOptions
   ): Promise<RegisterSchemaReturn> {
     try {
-
       const schema = options.schema
-      const schemaResource = {
-        id: utils.uuid(),
-        name: `${schema.name}-Schema`,
-        resourceType: 'anonCredsSchema',
-        data: {
-          name: schema.name,
-          version: schema.version,
-          attrNames: schema.attrNames,
-        },
-        version: schema.version,
-      }
-
-      // todo create and store
-
+      const result = await storeSchema({ schema })
       return {
         schemaState: {
           state: 'finished',
           schema,
-          schemaId: `${schema.issuerId}/resources/${schemaResource.id}`,
+          schemaId: result.schemaId,
         },
         registrationMetadata: {},
         schemaMetadata: {},
@@ -55,8 +66,7 @@ export class DbAnonCredsRegistry implements AnonCredsRegistry {
         error,
         did: options.schema.issuerId,
         schema: options,
-      })
-
+      });
       return {
         schemaMetadata: {},
         registrationMetadata: {},
@@ -68,22 +78,43 @@ export class DbAnonCredsRegistry implements AnonCredsRegistry {
       }
     }
   }
-  getCredentialDefinition(agentContext: AgentContext, credentialDefinitionId: string): Promise<GetCredentialDefinitionReturn> {
-    throw new Error('Method not implemented.')
+  public async getCredentialDefinition(agentContext: AgentContext, credentialDefinitionId: string): Promise<GetCredentialDefinitionReturn> {
+    try {
+      const credentialDefinition = await retrieveCredentialDefinition({ credentialDefinitionId });
+      return {
+        credentialDefinitionId: credentialDefinition.credentialDefinitionId,
+        credentialDefinition: {
+          issuerId: credentialDefinition.issuerId,
+          schemaId: credentialDefinition.schemaId,
+          tag: credentialDefinition.tag,
+          value: credentialDefinition.value,
+          type: 'CL'
+        },
+        credentialDefinitionMetadata: {},
+        resolutionMetadata: {},
+      }
+
+    } catch (e) {
+      return {
+        credentialDefinitionId,
+        credentialDefinitionMetadata: {},
+        resolutionMetadata: {
+          error: (e as Error).message || 'notFound',
+          message: `unable to resolve credential definition: ${(e as Error).message}`,
+        },
+      };
+    }
   }
   public async registerCredentialDefinition(agentContext: AgentContext, options: RegisterCredentialDefinitionOptions): Promise<RegisterCredentialDefinitionReturn> {
     try {
-      // throw new Error('Method not implemented.')
-      console.log(options)
-      console.log(options.credentialDefinition.value)
-
+      const result = await storeCredentialDefinition({ credDef: options.credentialDefinition });
       return {
         credentialDefinitionMetadata: {},
         registrationMetadata: {},
         credentialDefinitionState: {
           credentialDefinition: options.credentialDefinition,
-          state: 'failed',
-          reason: `unknownError`,
+          credentialDefinitionId: result.credentialDefinitionId,
+          state: 'finished',
         },
       };
 

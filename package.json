@@ -15,12 +15,13 @@
   },
   "dependencies": {
     "@aries-framework/anoncreds": "0.4.2",
-    "@aries-framework/core": "0.4.2"
+    "@aries-framework/core": "0.4.2",
+    "mongoose": "^8.3.2"
   },
   "devDependencies": {
     "@aries-framework/indy-sdk": "0.4.2",
-    "@types/indy-sdk": "*",
     "@stablelib/ed25519": "^1.0.2",
+    "@types/indy-sdk": "*",
     "rimraf": "^4.0.7",
     "rxjs": "^7.2.0",
     "tsyringe": "^4.8.0",
