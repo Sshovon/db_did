@@ -8,7 +8,6 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const connect = async (databaseUrl) => {
     try {
         await mongoose_1.default.connect(databaseUrl ?? 'mongodb://localhost:27017/ledger');
-        console.log('Connected to MongoDB');
     }
     catch (error) {
         console.error('Error connecting to MongoDB:', error);
@@ -19,7 +18,6 @@ exports.connect = connect;
 const disconnect = async () => {
     try {
         await mongoose_1.default.disconnect();
-        console.log('Disconnected from MongoDB');
     }
     catch (error) {
         console.error('Error disconnecting from MongoDB:', error);
