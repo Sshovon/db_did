@@ -1,31 +1,5 @@
-"use strict";
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var __decorateClass = (decorators, target, key, kind) => {
   var result = kind > 1 ? void 0 : kind ? __getOwnPropDesc(target, key) : target;
   for (var i = decorators.length - 1, decorator; i >= 0; i--)
@@ -35,16 +9,6 @@ var __decorateClass = (decorators, target, key, kind) => {
     __defProp(target, key, result);
   return result;
 };
-
-// src/index.ts
-var src_exports = {};
-__export(src_exports, {
-  DbAnonCredsRegistry: () => DbAnonCredsRegistry,
-  DbDidRegistrar: () => DbDidRegistrar,
-  DbDidResolver: () => DbDidResolver,
-  DbModule: () => DbModule
-});
-module.exports = __toCommonJS(src_exports);
 
 // node_modules/reflect-metadata/Reflect.js
 var Reflect2;
@@ -843,24 +807,24 @@ var Reflect2;
 })(Reflect2 || (Reflect2 = {}));
 
 // src/ledger/model/schema.ts
-var import_mongoose = __toESM(require("mongoose"));
-var DbSchema = new import_mongoose.default.Schema({
+import mongoose from "mongoose";
+var DbSchema = new mongoose.Schema({
   issuerId: { type: String, required: true },
   name: { type: String, required: true },
   version: { type: String, required: true },
   attrNames: { type: [String], required: true },
   schemaId: { type: String, required: true }
 });
-var DbSchemaModel = import_mongoose.default.model("DbSchema", DbSchema);
+var DbSchemaModel = mongoose.model("DbSchema", DbSchema);
 
 // src/ledger/controller/schema.ts
-var import_core = require("@aries-framework/core");
+import { utils } from "@aries-framework/core";
 
 // src/ledger/controller/db.ts
-var import_mongoose2 = __toESM(require("mongoose"));
+import mongoose2 from "mongoose";
 var connect = async (databaseUrl) => {
   try {
-    await import_mongoose2.default.connect(databaseUrl ?? "mongodb://localhost:27017/ledger");
+    await mongoose2.connect(databaseUrl ?? "mongodb://localhost:27017/ledger");
   } catch (error) {
     console.error("Error connecting to MongoDB:", error);
     throw error;
@@ -868,7 +832,7 @@ var connect = async (databaseUrl) => {
 };
 var disconnect = async () => {
   try {
-    await import_mongoose2.default.disconnect();
+    await mongoose2.disconnect();
   } catch (error) {
     console.error("Error disconnecting from MongoDB:", error);
     throw error;
@@ -880,7 +844,7 @@ async function storeSchema(options) {
   try {
     await connect();
     const schema = options.schema;
-    const schemaResourceId = import_core.utils.uuid();
+    const schemaResourceId = utils.uuid();
     const schemaId = `${schema.issuerId}/resources/schema/${schemaResourceId}`;
     const newSchema = new DbSchemaModel({
       schemaId,
@@ -925,11 +889,11 @@ async function retrieveSchema(options) {
 }
 
 // src/ledger/controller/credentialDefintion.ts
-var import_core2 = require("@aries-framework/core");
+import { utils as utils2 } from "@aries-framework/core";
 
 // src/ledger/model/credentialDefinition.ts
-var import_mongoose3 = __toESM(require("mongoose"));
-var CredentialDefinitionSchema = new import_mongoose3.default.Schema({
+import mongoose3 from "mongoose";
+var CredentialDefinitionSchema = new mongoose3.Schema({
   issuerId: { type: String, required: true },
   schemaId: { type: String, required: true },
   credentialDefinitionId: { type: String, required: true },
@@ -937,14 +901,14 @@ var CredentialDefinitionSchema = new import_mongoose3.default.Schema({
   tag: { type: String, required: true },
   type: { type: String, required: true }
 });
-var DbCredentialDefinitionModel = import_mongoose3.default.model("DbCredentialDefinition", CredentialDefinitionSchema);
+var DbCredentialDefinitionModel = mongoose3.model("DbCredentialDefinition", CredentialDefinitionSchema);
 
 // src/ledger/controller/credentialDefintion.ts
 async function storeCredentialDefinition(options) {
   try {
     await connect();
     const credDef = options.credDef;
-    const credDefResourceId = import_core2.utils.uuid();
+    const credDefResourceId = utils2.uuid();
     const credentialDefinitionId = `${credDef.issuerId}/resources/credential-definition/${credDefResourceId}`;
     const newCredDef = new DbCredentialDefinitionModel({
       credentialDefinitionId,
@@ -1107,64 +1071,83 @@ var DbAnonCredsRegistry = class {
 };
 
 // src/DbModule.ts
-var import_core3 = require("@aries-framework/core");
+import { AgentConfig, injectable } from "@aries-framework/core";
 var DbModule = class {
   constructor() {
   }
   register(dependencyManager) {
-    dependencyManager.resolve(import_core3.AgentConfig);
+    dependencyManager.resolve(AgentConfig);
   }
   async initialize(agentContext) {
   }
 };
 DbModule = __decorateClass([
-  (0, import_core3.injectable)()
+  injectable()
 ], DbModule);
 
 // src/dids/DbDidRegistrar.ts
-var import_core6 = require("@aries-framework/core");
+import {
+  DidDocumentRole,
+  DidRecord,
+  DidRepository
+} from "@aries-framework/core";
 
 // src/dids/DidKey.ts
-var import_core5 = require("@aries-framework/core");
+import { Key as Key2, parseDid } from "@aries-framework/core";
 
 // src/dids/keyDidDocument.ts
-var import_core4 = require("@aries-framework/core");
+import {
+  Key,
+  KeyType,
+  AriesFrameworkError,
+  SECURITY_CONTEXT_BBS_URL,
+  SECURITY_JWS_CONTEXT_URL,
+  SECURITY_X25519_CONTEXT_URL,
+  DidDocumentBuilder,
+  getBls12381g1g2VerificationMethod,
+  convertPublicKeyToX25519,
+  getBls12381G1Key2020,
+  getBls12381G2Key2020,
+  getEd25519VerificationKey2018,
+  getJsonWebKey2020,
+  getX25519KeyAgreementKey2019
+} from "@aries-framework/core";
 var didDocumentKeyTypeMapping = {
-  [import_core4.KeyType.Ed25519]: getEd25519DidDoc,
-  [import_core4.KeyType.X25519]: getX25519DidDoc,
-  [import_core4.KeyType.Bls12381g1]: getBls12381g1DidDoc,
-  [import_core4.KeyType.Bls12381g2]: getBls12381g2DidDoc,
-  [import_core4.KeyType.Bls12381g1g2]: getBls12381g1g2DidDoc,
-  [import_core4.KeyType.P256]: getJsonWebKey2020DidDocument,
-  [import_core4.KeyType.P384]: getJsonWebKey2020DidDocument,
-  [import_core4.KeyType.P521]: getJsonWebKey2020DidDocument
+  [KeyType.Ed25519]: getEd25519DidDoc,
+  [KeyType.X25519]: getX25519DidDoc,
+  [KeyType.Bls12381g1]: getBls12381g1DidDoc,
+  [KeyType.Bls12381g2]: getBls12381g2DidDoc,
+  [KeyType.Bls12381g1g2]: getBls12381g1g2DidDoc,
+  [KeyType.P256]: getJsonWebKey2020DidDocument,
+  [KeyType.P384]: getJsonWebKey2020DidDocument,
+  [KeyType.P521]: getJsonWebKey2020DidDocument
 };
 function getDidDocumentForKey(did, key) {
   const getDidDocument = didDocumentKeyTypeMapping[key.keyType];
   return getDidDocument(did, key);
 }
 function getBls12381g1DidDoc(did, key) {
-  const verificationMethod = (0, import_core4.getBls12381G1Key2020)({ id: `${did}#${key.fingerprint}`, key, controller: did });
+  const verificationMethod = getBls12381G1Key2020({ id: `${did}#${key.fingerprint}`, key, controller: did });
   return getSignatureKeyBase({
     did,
     key,
     verificationMethod
-  }).addContext(import_core4.SECURITY_CONTEXT_BBS_URL).build();
+  }).addContext(SECURITY_CONTEXT_BBS_URL).build();
 }
 function getBls12381g1g2DidDoc(did, key) {
-  const verificationMethods = (0, import_core4.getBls12381g1g2VerificationMethod)(did, key);
-  const didDocumentBuilder = new import_core4.DidDocumentBuilder(did);
+  const verificationMethods = getBls12381g1g2VerificationMethod(did, key);
+  const didDocumentBuilder = new DidDocumentBuilder(did);
   for (const verificationMethod of verificationMethods) {
     didDocumentBuilder.addVerificationMethod(verificationMethod).addAuthentication(verificationMethod.id).addAssertionMethod(verificationMethod.id).addCapabilityDelegation(verificationMethod.id).addCapabilityInvocation(verificationMethod.id);
   }
-  return didDocumentBuilder.addContext(import_core4.SECURITY_CONTEXT_BBS_URL).build();
+  return didDocumentBuilder.addContext(SECURITY_CONTEXT_BBS_URL).build();
 }
 function getJsonWebKey2020DidDocument(did, key) {
-  const verificationMethod = (0, import_core4.getJsonWebKey2020)({ did, key });
-  const didDocumentBuilder = new import_core4.DidDocumentBuilder(did);
-  didDocumentBuilder.addContext(import_core4.SECURITY_JWS_CONTEXT_URL).addVerificationMethod(verificationMethod);
+  const verificationMethod = getJsonWebKey2020({ did, key });
+  const didDocumentBuilder = new DidDocumentBuilder(did);
+  didDocumentBuilder.addContext(SECURITY_JWS_CONTEXT_URL).addVerificationMethod(verificationMethod);
   if (!key.supportsEncrypting && !key.supportsSigning) {
-    throw new import_core4.AriesFrameworkError("Key must support at least signing or encrypting");
+    throw new AriesFrameworkError("Key must support at least signing or encrypting");
   }
   if (key.supportsSigning) {
     didDocumentBuilder.addAuthentication(verificationMethod.id).addAssertionMethod(verificationMethod.id).addCapabilityDelegation(verificationMethod.id).addCapabilityInvocation(verificationMethod.id);
@@ -1175,30 +1158,30 @@ function getJsonWebKey2020DidDocument(did, key) {
   return didDocumentBuilder.build();
 }
 function getEd25519DidDoc(did, key) {
-  const verificationMethod = (0, import_core4.getEd25519VerificationKey2018)({ id: `${did}#${key.fingerprint}`, key, controller: did });
-  const publicKeyX25519 = (0, import_core4.convertPublicKeyToX25519)(key.publicKey);
-  const didKeyX25519 = import_core4.Key.fromPublicKey(publicKeyX25519, import_core4.KeyType.X25519);
-  const x25519VerificationMethod = (0, import_core4.getX25519KeyAgreementKey2019)({
+  const verificationMethod = getEd25519VerificationKey2018({ id: `${did}#${key.fingerprint}`, key, controller: did });
+  const publicKeyX25519 = convertPublicKeyToX25519(key.publicKey);
+  const didKeyX25519 = Key.fromPublicKey(publicKeyX25519, KeyType.X25519);
+  const x25519VerificationMethod = getX25519KeyAgreementKey2019({
     id: `${did}#${didKeyX25519.fingerprint}`,
     key: didKeyX25519,
     controller: did
   });
   const didDocBuilder = getSignatureKeyBase({ did, key, verificationMethod });
-  didDocBuilder.addContext(import_core4.SECURITY_X25519_CONTEXT_URL).addKeyAgreement(x25519VerificationMethod);
+  didDocBuilder.addContext(SECURITY_X25519_CONTEXT_URL).addKeyAgreement(x25519VerificationMethod);
   return didDocBuilder.build();
 }
 function getX25519DidDoc(did, key) {
-  const verificationMethod = (0, import_core4.getX25519KeyAgreementKey2019)({ id: `${did}#${key.fingerprint}`, key, controller: did });
-  const document = new import_core4.DidDocumentBuilder(did).addKeyAgreement(verificationMethod).addContext(import_core4.SECURITY_X25519_CONTEXT_URL).build();
+  const verificationMethod = getX25519KeyAgreementKey2019({ id: `${did}#${key.fingerprint}`, key, controller: did });
+  const document = new DidDocumentBuilder(did).addKeyAgreement(verificationMethod).addContext(SECURITY_X25519_CONTEXT_URL).build();
   return document;
 }
 function getBls12381g2DidDoc(did, key) {
-  const verificationMethod = (0, import_core4.getBls12381G2Key2020)({ id: `${did}#${key.fingerprint}`, key, controller: did });
+  const verificationMethod = getBls12381G2Key2020({ id: `${did}#${key.fingerprint}`, key, controller: did });
   return getSignatureKeyBase({
     did,
     key,
     verificationMethod
-  }).addContext(import_core4.SECURITY_CONTEXT_BBS_URL).build();
+  }).addContext(SECURITY_CONTEXT_BBS_URL).build();
 }
 function getSignatureKeyBase({
   did,
@@ -1206,7 +1189,7 @@ function getSignatureKeyBase({
   verificationMethod
 }) {
   const keyId = `${did}#${key.fingerprint}`;
-  return new import_core4.DidDocumentBuilder(did).addVerificationMethod(verificationMethod).addAuthentication(keyId).addAssertionMethod(keyId).addCapabilityDelegation(keyId).addCapabilityInvocation(keyId);
+  return new DidDocumentBuilder(did).addVerificationMethod(verificationMethod).addAuthentication(keyId).addAssertionMethod(keyId).addCapabilityDelegation(keyId).addCapabilityInvocation(keyId);
 }
 
 // src/dids/DidKey.ts
@@ -1216,8 +1199,8 @@ var DidKey = class _DidKey {
     this.key = key;
   }
   static fromDid(did) {
-    const parsed = (0, import_core5.parseDid)(did);
-    const key = import_core5.Key.fromFingerprint(parsed.id);
+    const parsed = parseDid(did);
+    const key = Key2.fromFingerprint(parsed.id);
     return new _DidKey(key);
   }
   get did() {
@@ -1252,11 +1235,11 @@ var DbDidRegistrar = class {
         privateKey
       });
       const didKey = new DidKey(key);
-      const didRecord = new import_core6.DidRecord({
+      const didRecord = new DidRecord({
         did: didKey.did,
-        role: import_core6.DidDocumentRole.Created
+        role: DidDocumentRole.Created
       });
-      const didRepository = agentContext.dependencyManager.resolve(import_core6.DidRepository);
+      const didRepository = agentContext.dependencyManager.resolve(DidRepository);
       await didRepository.save(agentContext, didRecord);
       return {
         didDocumentMetadata: {},
@@ -1320,13 +1303,13 @@ var DbDidRegistrar = class {
 };
 
 // src/dids/DbDidResolver.ts
-var import_core7 = require("@aries-framework/core");
+import { DidKey as DidKey2 } from "@aries-framework/core";
 var DbDidResolver = class {
   supportedMethods = ["db"];
   async resolve(agentContext, did) {
     const didDocumentMetadata = {};
     try {
-      const didDocument = import_core7.DidKey.fromDid(did).didDocument;
+      const didDocument = DidKey2.fromDid(did).didDocument;
       return {
         didDocument,
         didDocumentMetadata,
@@ -1344,13 +1327,12 @@ var DbDidResolver = class {
     }
   }
 };
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {
+export {
   DbAnonCredsRegistry,
   DbDidRegistrar,
   DbDidResolver,
   DbModule
-});
+};
 /*! Bundled license information:
 
 reflect-metadata/Reflect.js:
@@ -1369,4 +1351,4 @@ reflect-metadata/Reflect.js:
   and limitations under the License.
   ***************************************************************************** *)
 */
-//# sourceMappingURL=index.js.map
+//# sourceMappingURL=index.mjs.map
