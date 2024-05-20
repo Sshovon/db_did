@@ -15,13 +15,14 @@ import { AriesFrameworkError, Buffer, Hasher, JsonTransformer, TypedArrayEncoder
 
 import { DbDidRegistrar, DbDidResolver } from '../../dids/index'
 import { calculateResourceId } from '../utils/utils'
-import { retrieveSchema, storeSchema } from '../../ledger/controller/schema'
-import { retrieveCredentialDefinition, storeCredentialDefinition } from '../../ledger/controller/credentialDefintion'
+import { retrieveSchema, storeSchema } from '../../db/controller/schema'
+import { retrieveCredentialDefinition, storeCredentialDefinition } from '../../db/controller/credentialDefintion'
 
 export class DbAnonCredsRegistry implements AnonCredsRegistry {
+  constructor(protected db_url: string) { }
   public async getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn> {
     try {
-      const schema = await retrieveSchema({ schemaId })
+      const schema = await retrieveSchema({ db_url: this.db_url, schemaId })
       return {
         schema: {
           issuerId: schema.issuerId,
@@ -51,7 +52,7 @@ export class DbAnonCredsRegistry implements AnonCredsRegistry {
   ): Promise<RegisterSchemaReturn> {
     try {
       const schema = options.schema
-      const result = await storeSchema({ schema })
+      const result = await storeSchema({ db_url: this.db_url, schema })
       return {
         schemaState: {
           state: 'finished',
@@ -80,7 +81,7 @@ export class DbAnonCredsRegistry implements AnonCredsRegistry {
   }
   public async getCredentialDefinition(agentContext: AgentContext, credentialDefinitionId: string): Promise<GetCredentialDefinitionReturn> {
     try {
-      const credentialDefinition = await retrieveCredentialDefinition({ credentialDefinitionId });
+      const credentialDefinition = await retrieveCredentialDefinition({ db_url: this.db_url, credentialDefinitionId });
       return {
         credentialDefinitionId: credentialDefinition.credentialDefinitionId,
         credentialDefinition: {
@@ -107,7 +108,7 @@ export class DbAnonCredsRegistry implements AnonCredsRegistry {
   }
   public async registerCredentialDefinition(agentContext: AgentContext, options: RegisterCredentialDefinitionOptions): Promise<RegisterCredentialDefinitionReturn> {
     try {
-      const result = await storeCredentialDefinition({ credDef: options.credentialDefinition });
+      const result = await storeCredentialDefinition({db_url: this.db_url,  credDef: options.credentialDefinition });
       return {
         credentialDefinitionMetadata: {},
         registrationMetadata: {},

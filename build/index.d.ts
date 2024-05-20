@@ -2,6 +2,8 @@ import { AnonCredsRegistry, GetSchemaReturn, RegisterSchemaOptions, RegisterSche
 import { AgentContext, Module, DependencyManager, DidRegistrar, DidCreateResult, DidUpdateResult, DidDeactivateResult, DidCreateOptions, KeyType, Buffer, DidResolver, DidResolutionResult } from '@aries-framework/core';
 
 declare class DbAnonCredsRegistry implements AnonCredsRegistry {
+    protected db_url: string;
+    constructor(db_url: string);
     getSchema(agentContext: AgentContext, schemaId: string): Promise<GetSchemaReturn>;
     registerSchema(agentContext: AgentContext, options: RegisterSchemaOptions): Promise<RegisterSchemaReturn>;
     getCredentialDefinition(agentContext: AgentContext, credentialDefinitionId: string): Promise<GetCredentialDefinitionReturn>;

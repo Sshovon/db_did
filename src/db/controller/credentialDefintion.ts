@@ -12,9 +12,9 @@ export type ICredDef = {
     type: string;
 }
 
-export async function storeCredentialDefinition(options: { credDef: AnonCredsCredentialDefinition }): Promise<ICredDef> {
+export async function storeCredentialDefinition(options: { db_url: string, credDef: AnonCredsCredentialDefinition }): Promise<ICredDef> {
     try {
-        await connect();
+        await connect(options.db_url);
         const credDef = options.credDef
         const credDefResourceId = utils.uuid()
         const credentialDefinitionId = `${credDef.issuerId}/resources/credential-definition/${credDefResourceId}`
@@ -43,9 +43,9 @@ export async function storeCredentialDefinition(options: { credDef: AnonCredsCre
     }
 }
 
-export async function retrieveCredentialDefinition(options: { credentialDefinitionId: string }): Promise<ICredDef> {
+export async function retrieveCredentialDefinition(options: { db_url: string, credentialDefinitionId: string }): Promise<ICredDef> {
     try {
-        await connect();
+        await connect(options.db_url);
         const credDef = await DbCredentialDefinitionModel.findOne({ credentialDefinitionId: options.credentialDefinitionId });
         if (!credDef) {
             throw new Error('Credential Definition not found');

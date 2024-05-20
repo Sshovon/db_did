@@ -842,7 +842,7 @@ var Reflect2;
   });
 })(Reflect2 || (Reflect2 = {}));
 
-// src/ledger/model/schema.ts
+// src/db/model/schema.ts
 var import_mongoose = __toESM(require("mongoose"));
 var DbSchema = new import_mongoose.default.Schema({
   issuerId: { type: String, required: true },
@@ -853,10 +853,10 @@ var DbSchema = new import_mongoose.default.Schema({
 });
 var DbSchemaModel = import_mongoose.default.model("DbSchema", DbSchema);
 
-// src/ledger/controller/schema.ts
+// src/db/controller/schema.ts
 var import_core = require("@aries-framework/core");
 
-// src/ledger/controller/db.ts
+// src/db/controller/db.ts
 var import_mongoose2 = __toESM(require("mongoose"));
 var connect = async (databaseUrl) => {
   try {
@@ -875,10 +875,10 @@ var disconnect = async () => {
   }
 };
 
-// src/ledger/controller/schema.ts
+// src/db/controller/schema.ts
 async function storeSchema(options) {
   try {
-    await connect();
+    await connect(options.db_url);
     const schema = options.schema;
     const schemaResourceId = import_core.utils.uuid();
     const schemaId = `${schema.issuerId}/resources/schema/${schemaResourceId}`;
@@ -905,7 +905,7 @@ async function storeSchema(options) {
 }
 async function retrieveSchema(options) {
   try {
-    await connect();
+    await connect(options.db_url);
     const schema = await DbSchemaModel.findOne({ schemaId: options.schemaId });
     if (!schema) {
       throw new Error("Schema not found");
@@ -924,10 +924,10 @@ async function retrieveSchema(options) {
   }
 }
 
-// src/ledger/controller/credentialDefintion.ts
+// src/db/controller/credentialDefintion.ts
 var import_core2 = require("@aries-framework/core");
 
-// src/ledger/model/credentialDefinition.ts
+// src/db/model/credentialDefinition.ts
 var import_mongoose3 = __toESM(require("mongoose"));
 var CredentialDefinitionSchema = new import_mongoose3.default.Schema({
   issuerId: { type: String, required: true },
@@ -939,10 +939,10 @@ var CredentialDefinitionSchema = new import_mongoose3.default.Schema({
 });
 var DbCredentialDefinitionModel = import_mongoose3.default.model("DbCredentialDefinition", CredentialDefinitionSchema);
 
-// src/ledger/controller/credentialDefintion.ts
+// src/db/controller/credentialDefintion.ts
 async function storeCredentialDefinition(options) {
   try {
-    await connect();
+    await connect(options.db_url);
     const credDef = options.credDef;
     const credDefResourceId = import_core2.utils.uuid();
     const credentialDefinitionId = `${credDef.issuerId}/resources/credential-definition/${credDefResourceId}`;
@@ -970,7 +970,7 @@ async function storeCredentialDefinition(options) {
 }
 async function retrieveCredentialDefinition(options) {
   try {
-    await connect();
+    await connect(options.db_url);
     const credDef = await DbCredentialDefinitionModel.findOne({ credentialDefinitionId: options.credentialDefinitionId });
     if (!credDef) {
       throw new Error("Credential Definition not found");
@@ -992,9 +992,12 @@ async function retrieveCredentialDefinition(options) {
 
 // src/anoncreds/services/DbAnonCredsRegistry.ts
 var DbAnonCredsRegistry = class {
+  constructor(db_url) {
+    this.db_url = db_url;
+  }
   async getSchema(agentContext, schemaId) {
     try {
-      const schema = await retrieveSchema({ schemaId });
+      const schema = await retrieveSchema({ db_url: this.db_url, schemaId });
       return {
         schema: {
           issuerId: schema.issuerId,
@@ -1019,7 +1022,7 @@ var DbAnonCredsRegistry = class {
   async registerSchema(agentContext, options) {
     try {
       const schema = options.schema;
-      const result = await storeSchema({ schema });
+      const result = await storeSchema({ db_url: this.db_url, schema });
       return {
         schemaState: {
           state: "finished",
@@ -1048,7 +1051,7 @@ var DbAnonCredsRegistry = class {
   }
   async getCredentialDefinition(agentContext, credentialDefinitionId) {
     try {
-      const credentialDefinition = await retrieveCredentialDefinition({ credentialDefinitionId });
+      const credentialDefinition = await retrieveCredentialDefinition({ db_url: this.db_url, credentialDefinitionId });
       return {
         credentialDefinitionId: credentialDefinition.credentialDefinitionId,
         credentialDefinition: {
@@ -1074,7 +1077,7 @@ var DbAnonCredsRegistry = class {
   }
   async registerCredentialDefinition(agentContext, options) {
     try {
-      const result = await storeCredentialDefinition({ credDef: options.credentialDefinition });
+      const result = await storeCredentialDefinition({ db_url: this.db_url, credDef: options.credentialDefinition });
       return {
         credentialDefinitionMetadata: {},
         registrationMetadata: {},

@@ -11,9 +11,9 @@ export type ISchema = {
     attrNames: string[];
     schemaId: string;
 }
-export async function storeSchema(options: { schema: AnonCredsSchema }): Promise<ISchema> {
+export async function storeSchema(options: { db_url:string ,schema: AnonCredsSchema }): Promise<ISchema> {
     try {
-        await connect();
+        await connect(options.db_url);
         const schema = options.schema
         const schemaResourceId = utils.uuid()
         const schemaId = `${schema.issuerId}/resources/schema/${schemaResourceId}`
@@ -41,9 +41,9 @@ export async function storeSchema(options: { schema: AnonCredsSchema }): Promise
     }
 }
 
-export async function retrieveSchema(options: { schemaId: string }): Promise<ISchema> {
+export async function retrieveSchema(options: { db_url: string, schemaId: string }): Promise<ISchema> {
     try {
-        await connect();
+        await connect(options.db_url);
         const schema = await DbSchemaModel.findOne({ schemaId: options.schemaId });
         if (!schema) {
             throw new Error('Schema not found');
