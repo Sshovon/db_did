@@ -824,17 +824,24 @@ import { utils } from "@aries-framework/core";
 import mongoose2 from "mongoose";
 var connect = async (databaseUrl) => {
   try {
-    await mongoose2.connect(databaseUrl ?? "mongodb://localhost:27017/ledger");
+    console.debug("Connecting to MongoDB...");
+    console.debug(`Database URL: ${databaseUrl}`);
+    await mongoose2.connect(databaseUrl);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+    console.error("Error connecting to MongoDB:");
+    console.error(error.message);
+    console.error(JSON.stringify(error));
     throw error;
   }
 };
 var disconnect = async () => {
   try {
+    console.debug("Disconnecting from MongoDB...");
     await mongoose2.disconnect();
   } catch (error) {
-    console.error("Error disconnecting from MongoDB:", error);
+    console.error("Error disconnecting from MongoDB:");
+    console.error(error.message);
+    console.error(JSON.stringify(error));
     throw error;
   }
 };

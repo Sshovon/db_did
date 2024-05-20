@@ -860,17 +860,24 @@ var import_core = require("@aries-framework/core");
 var import_mongoose2 = __toESM(require("mongoose"));
 var connect = async (databaseUrl) => {
   try {
-    await import_mongoose2.default.connect(databaseUrl ?? "mongodb://localhost:27017/ledger");
+    console.debug("Connecting to MongoDB...");
+    console.debug(`Database URL: ${databaseUrl}`);
+    await import_mongoose2.default.connect(databaseUrl);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
+    console.error("Error connecting to MongoDB:");
+    console.error(error.message);
+    console.error(JSON.stringify(error));
     throw error;
   }
 };
 var disconnect = async () => {
   try {
+    console.debug("Disconnecting from MongoDB...");
     await import_mongoose2.default.disconnect();
   } catch (error) {
-    console.error("Error disconnecting from MongoDB:", error);
+    console.error("Error disconnecting from MongoDB:");
+    console.error(error.message);
+    console.error(JSON.stringify(error));
     throw error;
   }
 };
